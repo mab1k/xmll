@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<Conclusion xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="conclusion-01-02.xsd" ConclusionGUID="508889FE-84C3-DC36-91D1-CD3CD513F689" SchemaVersion="01.02">
+  <ExpertOrganization>
+    <OrgFullName>1</OrgFullName>
+    <OrgOGRN>2</OrgOGRN>
+    <OrgINN>1</OrgINN>
+    <OrgKPP>3</OrgKPP>
+    <Address>
+      <Country>4</Country>
+      <Region>5</Region>
+      <City>6</City>
+      <Street>7</Street>
+      <Building>8</Building>
+      <Room>9</Room>
+    </Address>
+  </ExpertOrganization>
+  <Documents>
+    <Document/>
+  </Documents>
+  <Declarant/>
+</Conclusion>
