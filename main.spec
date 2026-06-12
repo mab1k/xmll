@@ -1,12 +1,20 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+block_cipher = None
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
     datas=[],
-    hiddenimports=[],
+    hiddenimports=[
+        'climate_options',
+        'doc_types',
+        'engineering_survey_options',
+        'expert_type_options',
+        'region_options',
+        'summary_options',
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -14,7 +22,7 @@ a = Analysis(
     noarchive=False,
     optimize=0,
 )
-pyz = PYZ(a.pure)
+pyz = PYZ(a.pure, cipher=block_cipher)
 
 exe = EXE(
     pyz,
@@ -22,7 +30,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='main',
+    name='ГенераторЗаключения',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
