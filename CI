@@ -1,0 +1,98 @@
+Шаг 0. Сначала на вашем ПК (Windows)
+Убедитесь, что весь код на GitHub. В PowerShell на компьютере:
+
+cd C:\Users\ppiv0\PycharmProjects\xmll
+git add backend frontend docker-compose.yml main.py *.py docker
+git commit -m "Deploy to server"
+git push origin main
+Если репозиторий приватный — на сервере понадобится токен GitHub или SSH-ключ.
+
+Шаг 1. На сервере — установить Docker
+В SSH-сессии (root@ams-1-vm-6cwk):
+
+apt update && apt upgrade -y
+apt install -y docker.io docker-compose-v2 git
+systemctl enable docker
+systemctl start docker
+docker --version
+docker compose version
+Шаг 2. Скачать проект
+cd /opt
+git clone https://github.com/mab1k/xmll.git
+cd xmll
+Если git clone просит логин — репозиторий приватный. Тогда на ПК можно залить код через архив:
+
+# на Windows, в папке проекта (без PDF и мусора)
+git archive -o xmll-deploy.zip HEAD
+scp xmll-deploy.zip root@216.57.111.146:/opt/
+На сервере:
+
+cd /opt
+apt install -y unzip
+unzip xmll-deploy.zip -d xmll
+cd xmll
+Шаг 3. Задать пароли (обязательно!)
+На сервере создайте файл .env:
+
+nano /opt/xmll/.env
+Вставьте (пароли замените на свои):
+
+POSTGRES_PASSWORD=MyStr0ngDbPass2026
+JWT_SECRET=super-long-random-secret-key-change-me
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=MyAdminPass2026
+MINIO_ROOT_PASSWORD=MyMinioPass2026
+Сохранить: Ctrl+O, Enter, Ctrl+X.
+
+Пока docker-compose.yml не читает .env для всех полей — временно отредактируйте пароли прямо в compose:
+
+nano /opt/xmll/docker-compose.yml
+Замените:
+
+POSTGRES_PASSWORD: xmll → ваш пароль (в двух местах: postgres и DATABASE_URL)
+JWT_SECRET: change-me-in-production → длинный секрет
+ADMIN_PASSWORD: admin → ваш пароль админа
+MINIO_ROOT_PASSWORD: minioadmin → ваш пароль (и в MINIO_SECRET_KEY backend)
+Шаг 4. Запустить
+cd /opt/xmll
+docker compose up -d --build
+Первый запуск займёт 5–15 минут (скачивание образов и сборка).
+
+Проверка:
+
+docker compose ps
+Все сервисы должны быть Up, backend — healthy.
+
+Логи, если что-то не так:
+
+docker compose logs -f
+(Ctrl+C чтобы выйти)
+
+Шаг 5. Открыть порт в файрволе
+ufw allow 22
+ufw allow 8080
+ufw enable
+Шаг 6. Открыть сайт
+В браузере:
+
+http://216.57.111.146:8080
+
+Логин: admin и пароль, который задали в compose.
+
+Если сайт не открывается
+На сервере:
+
+curl -I http://localhost:8080
+Если отвечает — проблема в файрволе Timeweb. В панели облачного сервера откройте входящий TCP 8080 (группы безопасности / firewall).
+
+Привязка домена (когда будет готов)
+В DNS домена: A-запись @ → 216.57.111.146
+Поставить Caddy для HTTPS:
+apt install -y caddy
+nano /etc/caddy/Caddyfile
+expert-portal.рф {
+    reverse_proxy localhost:8080
+}
+systemctl reload caddy
+ufw allow 80
+ufw allow 443
