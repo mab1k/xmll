@@ -27,6 +27,7 @@ from backend.attempts_service import (
 )
 from backend.auth import create_access_token, get_current_user, require_env_admin, user_to_dict
 from backend.conclusion_builder import ValidationError, render_conclusion_xml_string
+from backend.downloads import attachment_disposition
 from backend.db import get_db, init_db
 from backend.demo import generate_demo_zip, get_demo_file_response, get_demo_form
 from backend.metadata import get_all_options
@@ -202,7 +203,7 @@ def attempts_generate(
     return StreamingResponse(
         buffer,
         media_type="application/zip",
-        headers={"Content-Disposition": 'attachment; filename="conclusion.zip"'},
+        headers={"Content-Disposition": attachment_disposition("conclusion.zip")},
     )
 
 
@@ -216,7 +217,7 @@ def attempts_download_archive(
     return Response(
         content=content,
         media_type="application/zip",
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        headers={"Content-Disposition": attachment_disposition(filename)},
     )
 
 
@@ -230,7 +231,7 @@ def files_download(
     return Response(
         content=content,
         media_type=stored.content_type,
-        headers={"Content-Disposition": f'attachment; filename="{stored.original_name}"'},
+        headers={"Content-Disposition": attachment_disposition(stored.original_name)},
     )
 
 
@@ -275,7 +276,7 @@ async def generate(
         return StreamingResponse(
             buffer,
             media_type="application/zip",
-            headers={"Content-Disposition": 'attachment; filename="conclusion.zip"'},
+            headers={"Content-Disposition": attachment_disposition("conclusion.zip")},
         )
 
 

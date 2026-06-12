@@ -21,8 +21,8 @@ function StoredFileRow({
   const handleDownload = async () => {
     try {
       await downloadStoredFile(fileId, fileName)
-    } catch {
-      window.alert('Не удалось скачать файл')
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : 'Не удалось скачать файл')
     }
   }
 

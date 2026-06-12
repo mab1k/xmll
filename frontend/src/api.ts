@@ -117,7 +117,7 @@ export function storedFileUrl(fileId: string): string {
 export async function downloadStoredFile(fileId: string, filename: string): Promise<void> {
   const response = await apiFetch(storedFileUrl(fileId))
   if (!response.ok) {
-    throw new Error('Не удалось скачать файл')
+    throw new Error(await parseError(response, 'Не удалось скачать файл'))
   }
   const blob = await response.blob()
   const url = URL.createObjectURL(blob)
