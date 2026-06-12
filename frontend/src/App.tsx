@@ -400,16 +400,8 @@ function App() {
           ))}
         </nav>
         <div className="sidebar-footer sidebar-actions">
-          {user.isAdmin && (
-            <Button variant="secondary" onClick={() => setView('admin')}>
-              Админка
-            </Button>
-          )}
           <Button variant="secondary" onClick={() => setView('list')}>
             К проектам
-          </Button>
-          <Button variant="secondary" onClick={handleLogout}>
-            Выйти
           </Button>
           <Button variant="secondary" onClick={() => void loadExample()} disabled={loading}>
             Заполнить примером
