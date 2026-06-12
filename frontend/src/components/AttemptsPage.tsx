@@ -21,6 +21,17 @@ function formatDate(value: string): string {
   return date.toLocaleString('ru-RU')
 }
 
+function useDebouncedValue<T>(value: T, delayMs: number): T {
+  const [debounced, setDebounced] = useState(value)
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebounced(value), delayMs)
+    return () => window.clearTimeout(timer)
+  }, [value, delayMs])
+
+  return debounced
+}
+
 export function AttemptsPage({
   onOpen,
   onCreate,
@@ -30,7 +41,11 @@ export function AttemptsPage({
 }: AttemptsPageProps) {
   const [items, setItems] = useState<AttemptSummary[]>([])
   const [search, setSearch] = useState('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [cadastral, setCadastral] = useState('')
+  const [egrzNumber, setEgrzNumber] = useState('')
+  const debouncedSearch = useDebouncedValue(search, 300)
+  const debouncedCadastral = useDebouncedValue(cadastral, 300)
+  const debouncedEgrzNumber = useDebouncedValue(egrzNumber, 300)
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
@@ -38,12 +53,8 @@ export function AttemptsPage({
   const [error, setError] = useState('')
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setDebouncedSearch(search)
-      setPage(1)
-    }, 300)
-    return () => window.clearTimeout(timer)
-  }, [search])
+    setPage(1)
+  }, [debouncedSearch, debouncedCadastral, debouncedEgrzNumber])
 
   const load = async (targetPage = page) => {
     setLoading(true)
@@ -53,6 +64,8 @@ export function AttemptsPage({
         page: targetPage,
         pageSize: PAGE_SIZE,
         search: debouncedSearch,
+        cadastral: debouncedCadastral,
+        egrzNumber: debouncedEgrzNumber,
       })
       setItems(result.items)
       setTotal(result.total)
@@ -67,7 +80,7 @@ export function AttemptsPage({
 
   useEffect(() => {
     void load(page)
-  }, [debouncedSearch, page])
+  }, [debouncedSearch, debouncedCadastral, debouncedEgrzNumber, page])
 
   const handleDownload = async (attempt: AttemptSummary) => {
     setError('')
@@ -101,7 +114,8 @@ export function AttemptsPage({
     }
   }
 
-  const emptyMessage = debouncedSearch
+  const hasFilters = Boolean(debouncedSearch || debouncedCadastral || debouncedEgrzNumber)
+  const emptyMessage = hasFilters
     ? 'По вашему запросу ничего не найдено.'
     : 'Пока нет сохранённых проектов.'
 
@@ -125,18 +139,26 @@ export function AttemptsPage({
         </div>
       </div>
 
-      <div className="attempts-toolbar">
+      <div className="attempts-filters">
         <input
-          className="input attempts-search"
+          className="input attempts-filter"
           placeholder="Поиск по названию проекта…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        {total > 0 && (
-          <span className="attempts-count">
-            Найдено: {total}
-          </span>
-        )}
+        <input
+          className="input attempts-filter"
+          placeholder="Кадастровый номер…"
+          value={cadastral}
+          onChange={(e) => setCadastral(e.target.value)}
+        />
+        <input
+          className="input attempts-filter"
+          placeholder="Номер заключения (ЕГРЗ)…"
+          value={egrzNumber}
+          onChange={(e) => setEgrzNumber(e.target.value)}
+        />
+        {total > 0 && <span className="attempts-count">Найдено: {total}</span>}
       </div>
 
       <div className="alert alert-info attempts-hint">
@@ -151,7 +173,7 @@ export function AttemptsPage({
       ) : items.length === 0 ? (
         <div className="attempts-empty">
           <p>{emptyMessage}</p>
-          {!debouncedSearch && <Button onClick={onCreate}>Создать первый проект</Button>}
+          {!hasFilters && <Button onClick={onCreate}>Создать первый проект</Button>}
         </div>
       ) : (
         <>
@@ -162,6 +184,16 @@ export function AttemptsPage({
                   <h3>{item.title}</h3>
                   {item.examinationObjectName && (
                     <p className="attempt-meta">Объект: {item.examinationObjectName}</p>
+                  )}
+                  {(item.cadastralNumbers || []).length > 0 && (
+                    <p className="attempt-meta">
+                      Кадастр: {(item.cadastralNumbers || []).join(', ')}
+                    </p>
+                  )}
+                  {(item.egrzNumbers || []).length > 0 && (
+                    <p className="attempt-meta">
+                      ЕГРЗ: {(item.egrzNumbers || []).join(', ')}
+                    </p>
                   )}
                   <p className="attempt-meta">Изменён: {formatDate(item.updatedAt)}</p>
                   {item.hasArchive && item.lastGeneratedAt && (

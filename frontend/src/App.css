@@ -344,16 +344,19 @@ textarea.input {
   margin-bottom: 24px;
 }
 
-.attempts-toolbar {
+.attempts-toolbar,
+.attempts-filters {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: center;
   margin-bottom: 16px;
 }
 
-.attempts-search {
-  flex: 1;
-  max-width: 420px;
+.attempts-search,
+.attempts-filter {
+  flex: 1 1 220px;
+  max-width: 100%;
 }
 
 .attempts-count {

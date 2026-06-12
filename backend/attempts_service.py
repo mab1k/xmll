@@ -40,6 +40,29 @@ def _file_map(attempt: Attempt) -> dict[str, StoredFile]:
     return {item.id: item for item in attempt.files}
 
 
+def _extract_cadastral_numbers(form: dict) -> list[str]:
+    return [
+        n.strip()
+        for n in form.get("cadastralNumbers") or []
+        if isinstance(n, str) and n.strip()
+    ]
+
+
+def _extract_egrz_numbers(form: dict) -> list[str]:
+    numbers: list[str] = []
+    for item in form.get("previousConclusions") or []:
+        if (item.get("numberFormat") or "egrz") == "egrz":
+            number = (item.get("number") or "").strip()
+            if number:
+                numbers.append(number)
+    for item in form.get("eepdUse") or []:
+        if (item.get("numberFormat") or "egrz") == "egrz":
+            number = (item.get("number") or "").strip()
+            if number:
+                numbers.append(number)
+    return numbers
+
+
 def _attempt_meta(row: Attempt, form: dict | None = None) -> dict:
     if form is None:
         form = json.loads(row.form_data)
@@ -47,7 +70,34 @@ def _attempt_meta(row: Attempt, form: dict | None = None) -> dict:
         "lastGeneratedAt": row.last_generated_at.isoformat() if row.last_generated_at else None,
         "hasArchive": bool(row.last_archive_key),
         "examinationObjectName": (form.get("examinationObject") or {}).get("name", ""),
+        "cadastralNumbers": _extract_cadastral_numbers(form),
+        "egrzNumbers": _extract_egrz_numbers(form),
     }
+
+
+def _matches_filters(
+    form: dict,
+    *,
+    cadastral: str = "",
+    egrz_number: str = "",
+) -> bool:
+    cadastral_value = cadastral.strip().lower()
+    if cadastral_value:
+        numbers = _extract_cadastral_numbers(form)
+        if not numbers:
+            return False
+        if not any(cadastral_value in number.lower() for number in numbers):
+            return False
+
+    egrz_value = egrz_number.strip().lower()
+    if egrz_value:
+        numbers = _extract_egrz_numbers(form)
+        if not numbers:
+            return False
+        if not any(egrz_value in number.lower() for number in numbers):
+            return False
+
+    return True
 
 
 def _get_attempt(db: Session, attempt_id: str) -> Attempt:
@@ -62,27 +112,31 @@ def list_attempts(
     _user: User,
     *,
     search: str = "",
+    cadastral: str = "",
+    egrz_number: str = "",
     page: int = 1,
     page_size: int = 10,
 ) -> dict:
     page = max(page, 1)
     page_size = min(max(page_size, 1), 50)
 
-    query = db.query(Attempt)
-    search_value = search.strip()
-    if search_value:
-        query = query.filter(Attempt.title.ilike(f"%{search_value}%"))
+    search_value = search.strip().lower()
+    rows = db.query(Attempt).order_by(Attempt.updated_at.desc()).all()
 
-    total = query.count()
-    rows = (
-        query.order_by(Attempt.updated_at.desc())
-        .offset((page - 1) * page_size)
-        .limit(page_size)
-        .all()
-    )
+    filtered_rows = []
+    for row in rows:
+        if search_value and search_value not in row.title.lower():
+            continue
+        form = json.loads(row.form_data)
+        if not _matches_filters(form, cadastral=cadastral, egrz_number=egrz_number):
+            continue
+        filtered_rows.append(row)
+
+    total = len(filtered_rows)
+    page_rows = filtered_rows[(page - 1) * page_size : page * page_size]
 
     items = []
-    for row in rows:
+    for row in page_rows:
         form = json.loads(row.form_data)
         items.append({
             "id": row.id,

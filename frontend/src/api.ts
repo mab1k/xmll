@@ -303,6 +303,8 @@ export async function fetchAttempts(params: {
   page?: number
   pageSize?: number
   search?: string
+  cadastral?: string
+  egrzNumber?: string
 } = {}): Promise<AttemptsPageResult> {
   const query = new URLSearchParams()
   if (params.page) {
@@ -313,6 +315,12 @@ export async function fetchAttempts(params: {
   }
   if (params.search?.trim()) {
     query.set('search', params.search.trim())
+  }
+  if (params.cadastral?.trim()) {
+    query.set('cadastral', params.cadastral.trim())
+  }
+  if (params.egrzNumber?.trim()) {
+    query.set('egrzNumber', params.egrzNumber.trim())
   }
   const suffix = query.toString() ? `?${query.toString()}` : ''
   const response = await apiFetch(`/api/attempts${suffix}`)

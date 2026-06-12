@@ -118,10 +118,20 @@ def attempts_list(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
     search: str = Query("", max_length=200),
+    cadastral: str = Query("", max_length=200),
+    egrz_number: str = Query("", max_length=200, alias="egrzNumber"),
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=50, alias="pageSize"),
 ):
-    return list_attempts(db, user, search=search, page=page, page_size=page_size)
+    return list_attempts(
+        db,
+        user,
+        search=search,
+        cadastral=cadastral,
+        egrz_number=egrz_number,
+        page=page,
+        page_size=page_size,
+    )
 
 
 @app.post("/api/attempts")

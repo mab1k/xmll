@@ -341,6 +341,8 @@ export interface AttemptSummary {
   id: string
   title: string
   examinationObjectName: string
+  cadastralNumbers: string[]
+  egrzNumbers: string[]
   createdAt: string
   updatedAt: string
   hasArchive: boolean
