@@ -1,5 +1,6 @@
 import { downloadStoredFile } from '../api'
 import { ATTACHMENT_SECTIONS } from '../formConfig'
+import { newId } from '../id'
 import { emptyAddress, emptyEntity } from '../defaultForm'
 import { ProjectAttachmentsSection } from './ProjectAttachmentsSection'
 import type {
@@ -240,7 +241,7 @@ export function SectionRenderer({ sectionId, form, options, update }: SectionRen
             variant="secondary"
             onClick={() => {
               const item: DocumentItem = {
-                id: crypto.randomUUID(),
+                id: newId(),
                 docType: '07.01',
                 docName: '',
                 docNumber: '',
@@ -284,7 +285,7 @@ export function SectionRenderer({ sectionId, form, options, update }: SectionRen
             variant="secondary"
             onClick={() => {
               const item: PreviousConclusion = {
-                id: crypto.randomUUID(),
+                id: newId(),
                 date: '',
                 number: '',
                 numberFormat: 'egrz',
@@ -327,7 +328,7 @@ export function SectionRenderer({ sectionId, form, options, update }: SectionRen
             variant="secondary"
             onClick={() => {
               const item: PreviousSimpleConclusion = {
-                id: crypto.randomUUID(),
+                id: newId(),
                 date: '',
                 number: '',
                 objectType: '',
@@ -512,7 +513,7 @@ export function SectionRenderer({ sectionId, form, options, update }: SectionRen
             variant="secondary"
             onClick={() => {
               const party: PartyItem = {
-                id: crypto.randomUUID(),
+                id: newId(),
                 partyType: 'developer',
                 entity: emptyEntity('organization'),
               }
@@ -596,7 +597,7 @@ export function SectionRenderer({ sectionId, form, options, update }: SectionRen
               update('finance', [
                 ...form.finance,
                 {
-                  id: crypto.randomUUID(),
+                  id: newId(),
                   financeType: '',
                   budgetType: '',
                   financeSize: '',
@@ -840,7 +841,7 @@ export function SectionRenderer({ sectionId, form, options, update }: SectionRen
             onClick={() =>
               update('designers', [
                 ...form.designers,
-                { ...emptyEntity('organization'), id: crypto.randomUUID(), general: '' },
+                { ...emptyEntity('organization'), id: newId(), general: '' },
               ])
             }
           >
@@ -916,7 +917,7 @@ export function SectionRenderer({ sectionId, form, options, update }: SectionRen
               update('eepdUse', [
                 ...form.eepdUse,
                 {
-                  id: crypto.randomUUID(),
+                  id: newId(),
                   note: '',
                   number: '',
                   numberFormat: 'egrz',
@@ -985,7 +986,7 @@ export function SectionRenderer({ sectionId, form, options, update }: SectionRen
             onClick={() =>
               update('engineeringSurveyAddresses', [
                 ...form.engineeringSurveyAddresses,
-                { id: crypto.randomUUID(), region: '', district: '' },
+                { id: newId(), region: '', district: '' },
               ])
             }
           >
@@ -1024,7 +1025,7 @@ export function SectionRenderer({ sectionId, form, options, update }: SectionRen
             variant="secondary"
             onClick={() => {
               const party: PartyItem = {
-                id: crypto.randomUUID(),
+                id: newId(),
                 partyType: 'developer',
                 entity: emptyEntity('organization'),
               }
@@ -1089,7 +1090,7 @@ export function SectionRenderer({ sectionId, form, options, update }: SectionRen
             onClick={() =>
               update('expertEngineeringSurveys', [
                 ...form.expertEngineeringSurveys,
-                { id: crypto.randomUUID(), surveyType: '', normsMismatches: [] },
+                { id: newId(), surveyType: '', normsMismatches: [] },
               ])
             }
           >
@@ -1205,7 +1206,7 @@ export function SectionRenderer({ sectionId, form, options, update }: SectionRen
               update('expertProjectDocuments', [
                 ...form.expertProjectDocuments,
                 {
-                  id: crypto.randomUUID(),
+                  id: newId(),
                   expertType: '',
                   dangerSolutions: '',
                   engineeringSurveyMismatches: [],
@@ -1544,7 +1545,7 @@ export function SectionRenderer({ sectionId, form, options, update }: SectionRen
             variant="secondary"
             onClick={() => {
               const item: Expert = {
-                id: crypto.randomUUID(),
+                id: newId(),
                 familyName: '',
                 firstName: '',
                 secondName: '',

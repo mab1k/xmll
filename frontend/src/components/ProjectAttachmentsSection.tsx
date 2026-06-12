@@ -1,4 +1,5 @@
 import { downloadStoredFile } from '../api'
+import { newId } from '../id'
 import type { ProjectAttachmentItem } from '../types'
 import { Button, Field, SectionCard, TextInput } from './ui'
 
@@ -54,7 +55,7 @@ export function ProjectAttachmentsSection({
     onChange([
       ...items,
       {
-        id: crypto.randomUUID(),
+        id: newId(),
         file: null,
         fileName: '',
         comment: '',

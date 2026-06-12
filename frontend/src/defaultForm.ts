@@ -1,3 +1,4 @@
+import { newId } from './id'
 import type {
   Address,
   ComplexCostRecord,
@@ -43,14 +44,14 @@ export const emptyEntity = (type: EntityData['type'] = 'organization'): EntityDa
 })
 
 export const emptyTei = (): TeiItem => ({
-  id: crypto.randomUUID(),
+  id: newId(),
   name: '',
   measure: '',
   value: '',
 })
 
 export const emptyMismatch = (): Mismatch => ({
-  id: crypto.randomUUID(),
+  id: newId(),
   summary: '',
   part: '',
   link: '',
@@ -128,7 +129,7 @@ export const createDefaultForm = (): FormState => ({
   projectDocumentsParties: [],
   finance: [
     {
-      id: crypto.randomUUID(),
+      id: newId(),
       financeType: '3',
       budgetType: '',
       financeSize: '',

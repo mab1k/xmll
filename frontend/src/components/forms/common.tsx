@@ -1,4 +1,5 @@
 import { emptyAddress, emptyEntity, emptyMismatch, emptyMismatchExtended, emptyTei } from '../../defaultForm'
+import { newId } from '../../id'
 import type {
   Address,
   ComplexCostRecord,
@@ -399,7 +400,7 @@ export function ObjectPartEditor({ parts, onChange, options }: ObjectPartEditorP
     onChange([
       ...parts,
       {
-        id: crypto.randomUUID(),
+        id: newId(),
         name: '',
         addresses: [emptyAddress()],
         functionsClass: '',

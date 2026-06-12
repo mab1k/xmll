@@ -1,10 +1,11 @@
 import { fetchDemoFile, fetchDemoForm } from './api'
+import { newId } from './id'
 import { emptyTei } from './defaultForm'
 import { hydrateForm } from './formStorage'
 import type { FormState, SerializableFormState } from './types'
 
 function withId<T extends { id?: string }>(item: T): T & { id: string } {
-  return { ...item, id: item.id || crypto.randomUUID() }
+  return { ...item, id: item.id || newId() }
 }
 
 export function ensureFormIds(form: FormState): FormState {

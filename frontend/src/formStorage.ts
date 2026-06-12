@@ -1,4 +1,5 @@
 import { createDefaultForm } from './defaultForm'
+import { newId } from './id'
 import type {
   AttachmentCategory,
   FileUploadRef,
@@ -31,7 +32,7 @@ function hydrateAttachments(data?: Partial<StoredProjectAttachments>): ProjectAt
   for (const category of ATTACHMENT_CATEGORIES) {
     result[category] = (data?.[category] || []).map((item) => ({
       ...item,
-      id: item.id || crypto.randomUUID(),
+      id: item.id || newId(),
       file: null,
       comment: item.comment || '',
     }))
@@ -54,7 +55,7 @@ export function hydrateForm(data: SerializableFormState): FormState {
     ...data,
     documents: (data.documents || []).map((doc) => ({
       ...doc,
-      id: doc.id || crypto.randomUUID(),
+      id: doc.id || newId(),
       file: null,
       signFiles: [],
       signStorageIds: doc.signStorageIds || [],
